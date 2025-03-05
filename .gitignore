@@ -21,6 +21,8 @@ __pycache__/
 data/
 docs/
 !data/README.md  # Include README if instructions are provided in the data folder
+!data/faiss_index.idx
+!data/faiss_metadata.json
 
 # Exclude deployment-specific configurations
 *.yaml  # Add specific exclusions if needed
