@@ -1,0 +1,22 @@
+# PDF Processing Configuration
+header_threshold_ratio: 0.1    # 10% of page height
+footer_threshold_ratio: 0.1    # 10% of page height
+clean_patterns:
+  - '\d{1,3} of \d{1,3}'       # Page numbers
+  - 'Confidential'
+  - 'Draft'
+
+# Feature Toggles
+ocr_enabled: true
+table_detection: true
+detect_toc: true
+include_metadata: true
+include_toc: true
+
+# Formatting Options
+text_formatting: true
+table_formatting: markdown     # Options: markdown, csv, json
+image_annotations: true
+
+# OCR Configuration
+tesseract_config: --oem 3 --psm 6

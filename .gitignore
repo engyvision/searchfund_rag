@@ -1,0 +1,26 @@
+# .gitignore
+
+# Exclude sensitive files
+.env
+
+# Exclude Python virtual environment
+env/
+
+# Exclude temporary/generated files
+*.log
+*.idx
+*.json
+
+# Exclude Python cache and system-specific files
+__pycache__/
+*.pyc
+.vscode/
+.DS_Store
+
+# Exclude large data files
+data/
+docs/
+!data/README.md  # Include README if instructions are provided in the data folder
+
+# Exclude deployment-specific configurations
+*.yaml  # Add specific exclusions if needed
