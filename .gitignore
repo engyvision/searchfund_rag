@@ -18,7 +18,7 @@ __pycache__/
 .DS_Store
 
 # Exclude large data files
-data/
+data/*
 docs/
 !data/README.md  # Include README if instructions are provided in the data folder
 !data/faiss_index.idx
