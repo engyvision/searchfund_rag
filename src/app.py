@@ -5,6 +5,7 @@ import faiss
 import numpy as np
 import streamlit as st
 from openai import OpenAI
+from config import OPENAI_API_KEY  # Import from config.py
 from dotenv import load_dotenv
 
 # Configure logging
@@ -19,7 +20,7 @@ load_dotenv()
 logging.info("Environment variables loaded.")
 
 # Initialize OpenAI client
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(api_key=OPENAI_API_KEY)
 logging.info("OpenAI client initialized.")
 
 # Load FAISS index and metadata
