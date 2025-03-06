@@ -23,9 +23,21 @@ logging.info("Environment variables loaded.")
 client = OpenAI(api_key=OPENAI_API_KEY)
 logging.info("OpenAI client initialized.")
 
+# Get the directory of the current script (app.py)
+current_dir = os.path.dirname(os.path.abspath(__file__))  # Returns the path to src/
+
+# Navigate up one level to the project root (where data/ is located)
+project_root = os.path.dirname(current_dir)
+
 # Load FAISS index and metadata
 faiss_index_file = "../data/faiss_index.idx"
 metadata_file = "../data/faiss_metadata.json"
+
+# Check if files exist locally or in deployment
+if not os.path.exists(faiss_index_file):
+    raise FileNotFoundError(f"FAISS index file not found: {faiss_index_file}")
+if not os.path.exists(metadata_file):
+    raise FileNotFoundError(f"Metadata file not found: {metadata_file}")
 
 logging.info("Loading FAISS index from: %s", faiss_index_file)
 index = faiss.read_index(faiss_index_file)
