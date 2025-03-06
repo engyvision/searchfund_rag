@@ -30,8 +30,8 @@ current_dir = os.path.dirname(os.path.abspath(__file__))  # Returns the path to 
 project_root = os.path.dirname(current_dir)
 
 # Load FAISS index and metadata
-faiss_index_file = "../data/faiss_index.idx"
-metadata_file = "../data/faiss_metadata.json"
+faiss_index_file = os.path.join(project_root, "data", "faiss_index.idx")
+metadata_file = os.path.join(project_root, "data", "faiss_metadata.json")
 
 # Check if files exist locally or in deployment
 if not os.path.exists(faiss_index_file):
