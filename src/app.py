@@ -201,7 +201,7 @@ Provide a structured and well-organized response. Highlight the sources of each 
             {"role": "user", "content": prompt}
         ],
         reasoning_effort="medium",
-        max_tokens=5000,
+        max_completion_tokens=5000,
         # temperature=0.7,
     )
     
