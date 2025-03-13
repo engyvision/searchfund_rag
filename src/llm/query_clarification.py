@@ -34,14 +34,14 @@ class QueryClarifier:
     def clarify_query(
         self, 
         query: str,
-        max_tokens: int = 100,
+        max_completion_tokens: int = 100,
         temperature: float = 0.5
     ) -> str:
         """Clarify a user query to improve retrieval performance.
         
         Args:
             query: The user's query
-            max_tokens: Maximum tokens for the response
+            max_completion_tokens: Maximum tokens for the response
             temperature: Sampling temperature
             
         Returns:
@@ -96,7 +96,7 @@ class QueryClarifier:
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": query}
                 ],
-                max_tokens=max_tokens,
+                max_completion_tokens=max_completion_tokens,
                 temperature=temperature
             )
             

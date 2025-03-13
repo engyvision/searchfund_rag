@@ -35,7 +35,7 @@ class AnswerGenerator:
         self, 
         query: str,
         context: str,
-        max_tokens: int = 1000,
+        max_completion_tokens: int = 1000,
         temperature: float = 0.7,
         reasoning_effort: str = "medium"
     ) -> str:
@@ -44,7 +44,7 @@ class AnswerGenerator:
         Args:
             query: The user's query
             context: The context information from retrieved documents
-            max_tokens: Maximum tokens for the response
+            max_completion_tokens: Maximum tokens for the response
             temperature: Sampling temperature
             reasoning_effort: Reasoning effort for the model (low, medium, high)
             
@@ -101,7 +101,7 @@ class AnswerGenerator:
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
                 ],
-                max_tokens=max_tokens,
+                max_completion_tokens=max_completion_tokens,
                 temperature=temperature,
                 reasoning_effort=reasoning_effort
             )
