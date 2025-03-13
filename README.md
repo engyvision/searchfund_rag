@@ -47,6 +47,20 @@ OPENAI_API_KEY=your-api-key
 
 ## Usage
 
+### Scraping Documents
+
+Scrape PDF documents from the IESE search funds website:
+
+```bash
+python src/scripts/scrape_documents.py --output-dir data/IESE
+```
+
+You can also automatically extract text from the downloaded PDFs:
+
+```bash
+python src/scripts/scrape_documents.py --output-dir data/IESE --extract-text --text-output-dir data/processed_txt
+```
+
 ### Generating Embeddings
 
 Generate embeddings for preprocessed text files:
