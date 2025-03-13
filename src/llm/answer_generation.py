@@ -36,7 +36,6 @@ class AnswerGenerator:
         query: str,
         context: str,
         max_completion_tokens: int = 1000,
-        temperature: float = 0.7,
         reasoning_effort: str = "medium"
     ) -> str:
         """Generate an answer to a query based on context.
@@ -45,7 +44,6 @@ class AnswerGenerator:
             query: The user's query
             context: The context information from retrieved documents
             max_completion_tokens: Maximum tokens for the response
-            temperature: Sampling temperature
             reasoning_effort: Reasoning effort for the model (low, medium, high)
             
         Returns:
@@ -102,7 +100,6 @@ class AnswerGenerator:
                     {"role": "user", "content": user_prompt}
                 ],
                 max_completion_tokens=max_completion_tokens,
-                temperature=temperature,
                 reasoning_effort=reasoning_effort
             )
             
