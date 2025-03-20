@@ -133,22 +133,166 @@ class FAISSIndexer:
                             unique_id = f"{file_name}_chunk_{chunk['chunk_index']}"
                             vector_list.append(chunk["embedding"])
                             id_list.append(unique_id)
+                            # Load content from file
+                            content = None
+                            # Try multiple possible paths for content files
+                            content_file_paths = [
+                                os.path.join(os.path.dirname(embeddings_file), "..", "preprocessed_data", file_name),  # Original path
+                                os.path.join(os.path.dirname(embeddings_file), "preprocessed_data", file_name),  # Direct subdirectory
+                                os.path.join("data", "preprocessed_data", file_name),  # From project root
+                                os.path.join("/workspaces/webscraper_project/data/preprocessed_data", file_name)  # Absolute path
+                            ]
+                            
+                            for path in content_file_paths:
+                                if os.path.exists(path):
+                                    content_file_path = path
+                                    logger.debug(f"Found content file at: {content_file_path}")
+                                    break
+                            else:
+                                content_file_path = None
+                                logger.warning(f"Content file not found for: {file_name} after trying multiple paths")
+                            
+                            try:
+                                if content_file_path and os.path.exists(content_file_path):
+                                    with open(content_file_path, "r", encoding="utf-8") as f:
+                                        file_content = f.read()
+                                    
+                                    # Process JSON content if needed
+                                    if file_content.startswith("{") and '"pages":' in file_content:
+                                        try:
+                                            content_json = json.loads(file_content)
+                                            text_content = []
+                                            for page in content_json.get('pages', []):
+                                                for text_block in page.get('text', []):
+                                                    if isinstance(text_block, str):
+                                                        text_content.append(text_block)
+                                            if text_content:
+                                                content = "\n\n".join(text_content)
+                                        except Exception as json_err:
+                                            logger.warning(f"Failed to parse JSON content for {file_name}: {json_err}")
+                                            content = file_content
+                                    else:
+                                        content = file_content
+                                else:
+                                    logger.warning(f"Content file not found: {content_file_path}")
+                            except Exception as e:
+                                logger.warning(f"Could not load content for {file_name}: {e}")
+                            
+                            # Store file reference, chunk index, and content
                             metadata_list.append({
                                 "file": file_name,
-                                "chunk_index": chunk["chunk_index"]
+                                "chunk_index": chunk["chunk_index"],
+                                "content": content if content else f"Content not available for {file_name}"
                             })
                     else:
                         # The list is just a single embedding vector
                         unique_id = file_name
                         vector_list.append(embed_data)
                         id_list.append(unique_id)
-                        metadata_list.append({"file": file_name})
+                        # Load content from file for single embeddings
+                        content = None
+                        # Try multiple possible paths for content files
+                        content_file_paths = [
+                            os.path.join(os.path.dirname(embeddings_file), "..", "preprocessed_data", file_name),  # Original path
+                            os.path.join(os.path.dirname(embeddings_file), "preprocessed_data", file_name),  # Direct subdirectory
+                            os.path.join("data", "preprocessed_data", file_name),  # From project root
+                            os.path.join("/workspaces/webscraper_project/data/preprocessed_data", file_name)  # Absolute path
+                        ]
+                        
+                        for path in content_file_paths:
+                            if os.path.exists(path):
+                                content_file_path = path
+                                logger.debug(f"Found content file at: {content_file_path}")
+                                break
+                        else:
+                            content_file_path = None
+                            logger.warning(f"Content file not found for: {file_name} after trying multiple paths")
+                        
+                        try:
+                            if content_file_path and os.path.exists(content_file_path):
+                                with open(content_file_path, "r", encoding="utf-8") as f:
+                                    file_content = f.read()
+                                
+                                # Process JSON content if needed
+                                if file_content.startswith("{") and '"pages":' in file_content:
+                                    try:
+                                        content_json = json.loads(file_content)
+                                        text_content = []
+                                        for page in content_json.get('pages', []):
+                                            for text_block in page.get('text', []):
+                                                if isinstance(text_block, str):
+                                                    text_content.append(text_block)
+                                        if text_content:
+                                            content = "\n\n".join(text_content)
+                                    except Exception as json_err:
+                                        logger.warning(f"Failed to parse JSON content for {file_name}: {json_err}")
+                                        content = file_content
+                                else:
+                                    content = file_content
+                            else:
+                                logger.warning(f"Content file not found: {content_file_path}")
+                        except Exception as e:
+                            logger.warning(f"Could not load content for {file_name}: {e}")
+                        
+                        metadata_list.append({
+                            "file": file_name,
+                            "content": content if content else f"Content not available for {file_name}"
+                        })
                 else:
                     # Single embedding that's not in a list
                     unique_id = file_name
                     vector_list.append(embed_data)
                     id_list.append(unique_id)
-                    metadata_list.append({"file": file_name})
+                    
+                    # Load content from file for single embeddings
+                    content = None
+                    # Try multiple possible paths for content files
+                    content_file_paths = [
+                        os.path.join(os.path.dirname(embeddings_file), "..", "preprocessed_data", file_name),  # Original path
+                        os.path.join(os.path.dirname(embeddings_file), "preprocessed_data", file_name),  # Direct subdirectory
+                        os.path.join("data", "preprocessed_data", file_name),  # From project root
+                        os.path.join("/workspaces/webscraper_project/data/preprocessed_data", file_name)  # Absolute path
+                    ]
+                    
+                    for path in content_file_paths:
+                        if os.path.exists(path):
+                            content_file_path = path
+                            logger.debug(f"Found content file at: {content_file_path}")
+                            break
+                    else:
+                        content_file_path = None
+                        logger.warning(f"Content file not found for: {file_name} after trying multiple paths")
+                    
+                    try:
+                        if content_file_path and os.path.exists(content_file_path):
+                            with open(content_file_path, "r", encoding="utf-8") as f:
+                                file_content = f.read()
+                            
+                            # Process JSON content if needed
+                            if file_content.startswith("{") and '"pages":' in file_content:
+                                try:
+                                    content_json = json.loads(file_content)
+                                    text_content = []
+                                    for page in content_json.get('pages', []):
+                                        for text_block in page.get('text', []):
+                                            if isinstance(text_block, str):
+                                                text_content.append(text_block)
+                                    if text_content:
+                                        content = "\n\n".join(text_content)
+                                except Exception as json_err:
+                                    logger.warning(f"Failed to parse JSON content for {file_name}: {json_err}")
+                                    content = file_content
+                            else:
+                                content = file_content
+                        else:
+                            logger.warning(f"Content file not found: {content_file_path}")
+                    except Exception as e:
+                        logger.warning(f"Could not load content for {file_name}: {e}")
+                    
+                    metadata_list.append({
+                        "file": file_name,
+                        "content": content if content else f"Content not available for {file_name}"
+                    })
             
             # Convert to numpy array
             vectors_np = np.array(vector_list, dtype=np.float32)
