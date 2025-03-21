@@ -61,7 +61,7 @@ class QueryClarifier:
 
         # Output Format
 
-        - Present the rephrased query clearly.
+        - Present only the rephrased query clearly.
 
         # Examples
 

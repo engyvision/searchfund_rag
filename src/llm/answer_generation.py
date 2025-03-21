@@ -35,8 +35,9 @@ class AnswerGenerator:
         self, 
         query: str,
         context: str,
-        max_completion_tokens: int = 1000,
-        reasoning_effort: str = "medium"
+        max_completion_tokens: int = 10000,
+        reasoning_effort: str = "medium",
+        include_source_explanations: bool = True
     ) -> str:
         """Generate an answer to a query based on context.
         
@@ -45,6 +46,7 @@ class AnswerGenerator:
             context: The context information from retrieved documents
             max_completion_tokens: Maximum tokens for the response
             reasoning_effort: Reasoning effort for the model (low, medium, high)
+            include_source_explanations: Whether to include explanations of source relevance
             
         Returns:
             str: The generated answer
@@ -52,7 +54,14 @@ class AnswerGenerator:
         logger.info(f"Generating answer for query: {query}")
         
         system_prompt = """
-        You are tasked with acting as a search fund expert to answer a specific question based on a provided context and augmented with your own knowledge and web results, if available. Ensure your response targets the correct user group—either a searcher, search fund investor, business owner, or intermediary—based on the question's details. The provided context should be considered the most reliable source unless newer or strongly contradictory evidence is found through your knowledge or online sources, in which case this should be highlighted in your response.
+        You are tasked with acting as a search fund expert to answer a specific question based on a provided context and augmented with your own knowledge and web results, if available. Ensure your response targets the correct user group—either a searcher, search fund investor, business owner, or intermediary—based on the question's details. 
+        
+        The provided context has been retrieved using an advanced hybrid retrieval system that combines multiple methods:
+        1. Contextual embeddings that consider the query when retrieving documents
+        2. Keyword-based BM25 search for stronger term matches
+        3. LLM-based reranking that evaluates document relevance to the query
+        
+        The context includes relevance scores from these methods. Higher scores indicate greater relevance. The provided context should be considered the most reliable source unless newer or strongly contradictory evidence is found through your knowledge or online sources, in which case this should be highlighted in your response.
 
         # Steps
 
@@ -92,6 +101,12 @@ class AnswerGenerator:
         Answer:
         """
         
+        if include_source_explanations:
+            user_prompt += """
+            
+            After your answer, please include a brief explanation of which sources were most helpful for answering this query and why.
+            """
+        
         try:
             response = self.client.chat.completions.create(
                 model=self.model,
@@ -100,7 +115,8 @@ class AnswerGenerator:
                     {"role": "user", "content": user_prompt}
                 ],
                 max_completion_tokens=max_completion_tokens,
-                reasoning_effort=reasoning_effort
+                reasoning_effort=reasoning_effort,
+                # temperature=0.2  # Lower temperature for more deterministic responses
             )
             
             answer = response.choices[0].message.content.strip()
@@ -109,6 +125,10 @@ class AnswerGenerator:
             usage = getattr(response, "usage", None)
             if usage:
                 logger.info(f"Token usage: Prompt: {usage.prompt_tokens}, Completion: {usage.completion_tokens}, Total: {usage.total_tokens}")
+                
+                # Check if we're close to the token limit
+                if usage.completion_tokens > max_completion_tokens * 0.9:
+                    logger.warning(f"Answer completion is using {usage.completion_tokens} tokens, which is close to the max limit of {max_completion_tokens}")
             
             logger.info("Answer generated successfully")
             return answer

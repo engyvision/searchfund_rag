@@ -10,9 +10,10 @@ import argparse
 import os
 from pathlib import Path
 
-from src.core import get_logger
-from src.llm import QueryClarifier, AnswerGenerator
-from src.retrieval import DocumentRetriever
+from src.core.logging import get_logger
+from src.llm.query_clarification import QueryClarifier
+from src.llm.answer_generation import AnswerGenerator
+from src.retrieval.retrieval import DocumentRetriever
 
 # Initialize logger
 logger = get_logger("scripts.test_rag")

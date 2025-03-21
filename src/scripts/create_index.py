@@ -27,21 +27,21 @@ def parse_args():
     parser.add_argument(
         "--embeddings-file",
         type=str,
-        default="data/embeddings.json",
+        default="/workspaces/webscraper_project/data/embeddings.json",
         help="JSON file containing embeddings"
     )
     
     parser.add_argument(
         "--index-file",
         type=str,
-        default="data/faiss_index.idx",
+        default="/workspaces/webscraper_project/data/faiss_index.idx",
         help="Output file for FAISS index"
     )
     
     parser.add_argument(
         "--metadata-file",
         type=str,
-        default="data/faiss_metadata.json",
+        default="/workspaces/webscraper_project/data/faiss_metadata.json",
         help="Output file for metadata"
     )
     
