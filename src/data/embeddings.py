@@ -103,6 +103,53 @@ class EmbeddingService:
             logger.error(f"Error getting embedding: {e}")
             raise
     
+    def get_embedding_vector(self, texts: List[str]) -> List[List[float]]:
+        """Get embeddings for a list of text strings.
+        
+        This is a simplified version of get_embedding that doesn't return token counts
+        and handles batches of text. Used by the contextual embedding retriever.
+        
+        Args:
+            texts: List of texts to embed
+            
+        Returns:
+            List[List[float]]: List of embeddings
+            
+        Raises:
+            Exception: If the API call fails
+        """
+        try:
+            response = self.client.embeddings.create(input=texts, model=self.model)
+            embeddings = [data.embedding for data in response.data]
+            return embeddings
+        except Exception as e:
+            logger.error(f"Error getting embeddings for batch: {e}")
+            raise
+    
+    def get_contextual_embedding(self, query: str, text: str) -> List[float]:
+        """Get a contextual embedding that considers the query when embedding text.
+        
+        Args:
+            query: The query context
+            text: The text to embed
+            
+        Returns:
+            List[float]: The contextual embedding
+            
+        Raises:
+            Exception: If the API call fails
+        """
+        contextual_prompt = f"""
+        You are embedding a document to determine if it's relevant to the following query:
+        
+        Query: {query}
+        
+        Document: {text}
+        """
+        
+        embedding, _ = self.get_embedding(contextual_prompt)
+        return embedding
+    
     def embed_document(
         self, 
         document: str, 

@@ -92,7 +92,12 @@ def setup_logging(
     
     # Set level based on environment if not specified
     if log_level is None:
-        log_level = LOG_LEVELS.get(ENV, logging.INFO)
+        # For better logging during development, set retrieval and hybrid logging to INFO
+        # to avoid excessive debug logs, while keeping other logs at DEBUG level
+        if name.startswith("retrieval") or "hybrid" in name or "rerank" in name:
+            log_level = logging.INFO
+        else:
+            log_level = LOG_LEVELS.get(ENV, logging.INFO)
     
     logger.setLevel(log_level)
     

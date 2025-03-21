@@ -11,10 +11,34 @@ import json
 from typing import Dict, List, Any, Optional, Union, Callable
 from pathlib import Path
 
-from src.core import get_logger
+from src.core.logging import get_logger
 
 # Initialize logger
 logger = get_logger("data.preprocessing")
+
+def preprocess_text(text: str) -> str:
+    """Preprocess text for BM25 and other retrieval methods.
+    
+    Args:
+        text: Text to preprocess
+        
+    Returns:
+        str: Preprocessed text
+    """
+    # Convert to lowercase
+    text = text.lower()
+    
+    # Replace multiple whitespace with single space
+    text = re.sub(r'\s+', ' ', text)
+    
+    # Remove punctuation
+    text = re.sub(r'[^\w\s]', '', text)
+    
+    # Remove extra whitespace
+    text = text.strip()
+    
+    return text
+
 
 class TextPreprocessor:
     """Text preprocessing for documents."""
