@@ -6,7 +6,13 @@ search fund assistant, submitting queries and receiving answers.
 """
 
 import streamlit as st
+import os
+import sys
 
+# Add the project root to the path for imports
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+
+# Now use relative imports
 from src.core.logging import get_logger
 from src.llm.query_clarification import QueryClarifier
 from src.llm.answer_generation import AnswerGenerator
@@ -42,8 +48,10 @@ def initialize_components(use_hybrid_retrieval: bool = True, use_reranking: bool
         if use_contextual_index:
             # Check if contextual index exists
             import os
-            contextual_index_file = "/workspaces/webscraper_project/data/faiss_contextual_index.idx"
-            contextual_metadata_file = "/workspaces/webscraper_project/data/faiss_contextual_metadata.json"
+            # Use relative path that works across environments
+            data_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data"))
+            contextual_index_file = os.path.join(data_dir, "faiss_contextual_index.idx")
+            contextual_metadata_file = os.path.join(data_dir, "faiss_contextual_metadata.json")
             
             if os.path.exists(contextual_index_file) and os.path.exists(contextual_metadata_file):
                 # Import and initialize FAISSIndexer directly to override settings
@@ -122,8 +130,10 @@ def main():
     
     # Add option to use contextual index
     import os
-    contextual_index_file = "/workspaces/webscraper_project/data/faiss_contextual_index.idx"
-    contextual_metadata_file = "/workspaces/webscraper_project/data/faiss_contextual_metadata.json"
+    # Use relative path that works across environments
+    data_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data"))
+    contextual_index_file = os.path.join(data_dir, "faiss_contextual_index.idx")
+    contextual_metadata_file = os.path.join(data_dir, "faiss_contextual_metadata.json")
     contextual_index_exists = os.path.exists(contextual_index_file) and os.path.exists(contextual_metadata_file)
     
     if contextual_index_exists:
