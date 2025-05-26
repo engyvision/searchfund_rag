@@ -1,0 +1,21 @@
+# Simple test configuration for Perplexity (query clarification only)
+
+embeddings:
+  provider: openai
+  model: text-embedding-3-small
+  api_key: ${OPENAI_API_KEY}  # Will be filled from environment variable
+
+query_clarification:
+  provider: perplexity
+  model: pplx-7b-online
+  api_key: ${PERPLEXITY_API_KEY}
+
+answer_generation:
+  provider: openai
+  model: o3-mini-2025-01-31
+  api_key: ${OPENAI_API_KEY}
+
+reranking:
+  provider: openai
+  model: o3-mini-2025-01-31
+  api_key: ${OPENAI_API_KEY}

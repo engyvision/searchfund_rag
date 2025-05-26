@@ -1,22 +1,17 @@
-# PDF Processing Configuration
-header_threshold_ratio: 0.1    # 10% of page height
-footer_threshold_ratio: 0.1    # 10% of page height
-clean_patterns:
-  - '\d{1,3} of \d{1,3}'       # Page numbers
-  - 'Confidential'
-  - 'Draft'
+# PDF URLs to scrape
+pdf_urls:
+  # IESE
+  2023-note-investors: https://media.iese.edu/research/pdfs/ST-0644-E.pdf
+  2018-intl-search-fund-study: https://media.iese.edu/research/pdfs/ST-0477-E.pdf
+  2017-rethinking-search-fund: https://media.iese.edu/research/pdfs/ST-0450-E.pdf
+  2014-search-funds-what-works: https://media.iese.edu/research/pdfs/ST-0357-E.pdf
+  2023-nurturing-leadership: https://media.iese.edu/research/pdfs/ST-0632-E.pdf
+  2023-ebitda-tax-strategies: https://media.iese.edu/research/pdfs/ST-0645-E.pdf
+  2024-intl-search-fund-study: https://media.iese.edu/research/pdfs/ST-0650-E.pdf
+  2024-transformations-path-excellence: https://media.iese.edu/research/pdfs/ST-0662-E.pdf
+  letter-to-young-operator: https://media.iese.edu/research/pdfs/ST-0634-E.pdf
+  intern-training-manual: https://media.iese.edu/research/pdfs/OP-03-26-E.pdf
+  intern-director-training-manual: https://media.iese.edu/research/pdfs/OP-03-27-E.pdf
 
-# Feature Toggles
-ocr_enabled: true
-table_detection: true
-detect_toc: true
-include_metadata: true
-include_toc: true
-
-# Formatting Options
-text_formatting: true
-table_formatting: markdown     # Options: markdown, csv, json
-image_annotations: true
-
-# OCR Configuration
-tesseract_config: --oem 3 --psm 6
+# Output directory for PDFs
+output_directory: data/IESE

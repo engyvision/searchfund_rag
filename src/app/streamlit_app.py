@@ -38,7 +38,15 @@ def initialize_components(use_hybrid_retrieval: bool = True, use_reranking: bool
     
     if query_clarifier is None:
         with st.spinner("Loading query clarifier..."):
-            query_clarifier = QueryClarifier()
+            try:
+                query_clarifier = QueryClarifier()
+                provider_name = query_clarifier.provider.provider_name
+                st.success(f"Query clarifier loaded with {provider_name} provider")
+            except Exception as e:
+                st.error(f"Error loading query clarifier: {str(e)}")
+                # Fallback to old initialization method
+                from src.core import OPENAI_CONFIG
+                query_clarifier = QueryClarifier()
     
     # Always recreate document retriever to apply new settings
     with st.spinner("Loading document retriever..."):
@@ -81,7 +89,15 @@ def initialize_components(use_hybrid_retrieval: bool = True, use_reranking: bool
     
     if answer_generator is None:
         with st.spinner("Loading answer generator..."):
-            answer_generator = AnswerGenerator()
+            try:
+                answer_generator = AnswerGenerator()
+                provider_name = answer_generator.provider.provider_name
+                st.success(f"Answer generator loaded with {provider_name} provider")
+            except Exception as e:
+                st.error(f"Error loading answer generator: {str(e)}")
+                # Fallback to old initialization method
+                from src.core import OPENAI_CONFIG
+                answer_generator = AnswerGenerator()
 
 def process_query(
     query: str, 

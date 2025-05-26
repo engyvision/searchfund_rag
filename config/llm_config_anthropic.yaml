@@ -1,0 +1,21 @@
+# LLM configuration using OpenAI for embeddings and Anthropic for reasoning
+
+embeddings:
+  provider: openai
+  model: text-embedding-3-small
+  api_key: ${OPENAI_API_KEY}  # Will be filled from environment variable
+
+query_clarification:
+  provider: anthropic
+  model: claude-3-haiku-20240307
+  api_key: ${ANTHROPIC_API_KEY}
+
+answer_generation:
+  provider: anthropic
+  model: claude-3-opus-20240229
+  api_key: ${ANTHROPIC_API_KEY}
+
+reranking:
+  provider: anthropic
+  model: claude-3-sonnet-20240229
+  api_key: ${ANTHROPIC_API_KEY}

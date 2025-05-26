@@ -11,9 +11,9 @@ from typing import Dict, List, Any, Optional, Tuple, Union
 import numpy as np
 import tiktoken
 from tenacity import retry, wait_random_exponential, stop_after_attempt
-from openai import OpenAI
 
-from src.core import get_logger, OPENAI_CONFIG
+from src.core import get_logger, OPENAI_CONFIG, LLM_CONFIG
+from src.llm.providers import get_provider
 
 # Initialize logger
 logger = get_logger("data.embeddings")
@@ -27,17 +27,11 @@ TOKEN_LIMIT = 8192
 class EmbeddingService:
     """Service for generating and managing embeddings."""
     
-    def __init__(self, api_key: str = OPENAI_CONFIG.api_key, model: str = OPENAI_CONFIG.embedding_model):
-        """Initialize the embedding service.
-        
-        Args:
-            api_key: OpenAI API key
-            model: Embedding model to use
-        """
-        self.client = OpenAI(api_key=api_key)
-        self.model = model
+    def __init__(self):
+        """Initialize the embedding service."""
         self.tokenizer = tiktoken.get_encoding("cl100k_base")
-        logger.info(f"Initialized EmbeddingService with model: {model}")
+        self.provider = get_provider(LLM_CONFIG.config_data, "embeddings")
+        logger.info(f"Initialized EmbeddingService with provider: {self.provider.provider_name}")
     
     def count_tokens(self, text: str) -> int:
         """Count the number of tokens in a text string.
@@ -81,7 +75,6 @@ class EmbeddingService:
         logger.debug(f"Split text into {len(chunks)} chunks with max_tokens={max_tokens}, overlap={overlap}")
         return chunks
     
-    @retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
     def get_embedding(self, text: str) -> Tuple[List[float], Optional[int]]:
         """Get an embedding for a text string.
         
@@ -94,14 +87,7 @@ class EmbeddingService:
         Raises:
             Exception: If the API call fails
         """
-        try:
-            response = self.client.embeddings.create(input=text, model=self.model)
-            embedding = response.data[0].embedding
-            tokens_used = response.usage.total_tokens if hasattr(response, "usage") and hasattr(response.usage, "total_tokens") else None
-            return embedding, tokens_used
-        except Exception as e:
-            logger.error(f"Error getting embedding: {e}")
-            raise
+        return self.provider.get_embedding(text)
     
     def get_embedding_vector(self, texts: List[str]) -> List[List[float]]:
         """Get embeddings for a list of text strings.
@@ -118,13 +104,7 @@ class EmbeddingService:
         Raises:
             Exception: If the API call fails
         """
-        try:
-            response = self.client.embeddings.create(input=texts, model=self.model)
-            embeddings = [data.embedding for data in response.data]
-            return embeddings
-        except Exception as e:
-            logger.error(f"Error getting embeddings for batch: {e}")
-            raise
+        return self.provider.get_embedding_vector(texts)
     
     def get_contextual_embedding(self, query: str, text: str) -> List[float]:
         """Get a contextual embedding that considers the query when embedding text.

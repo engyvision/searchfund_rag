@@ -1,8 +1,6 @@
 from typing import List, Dict, Any, Optional
 import numpy as np
-from openai import OpenAI
-from src.core import OPENAI_CONFIG
-from src.core.logging import get_logger
+from src.core import get_logger, LLM_CONFIG
 
 # Initialize logger
 logger = get_logger("retrieval.contextual_embeddings")
@@ -22,7 +20,6 @@ class ContextualEmbeddingRetriever:
         self.index = index
         self.embedding_function = embedding_function
         self.top_k = top_k
-        self.client = OpenAI(api_key=OPENAI_CONFIG.api_key)
     
     def _get_contextual_embedding_prompt(self, query: str) -> str:
         """Generate a prompt that includes the query context for embedding."""

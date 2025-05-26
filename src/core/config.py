@@ -7,8 +7,9 @@ multiple environments (local development, Streamlit Cloud) and configuration sou
 """
 
 import os
+import re
 import yaml
-from typing import Dict, Any, Optional
+from typing import Dict, List, Any, Optional
 from pathlib import Path
 from pydantic import BaseModel, Field, ValidationError
 from dotenv import load_dotenv
@@ -38,11 +39,17 @@ class PDFConfig(BaseModel):
     pdf_urls: Optional[Dict[str, str]] = None
     output_directory: Optional[str] = None
 
+class LLMConfig(BaseModel):
+    """Configuration for LLM providers."""
+    config_file: str = Field("config/llm_config_default.yaml", description="Path to LLM config YAML")
+    config_data: Dict[str, Any] = Field(default_factory=dict, description="LLM configuration data")
+
 class AppConfig(BaseModel):
     """Master configuration for the application."""
     openai: OpenAIConfig
     faiss: FAISSConfig
     pdf: PDFConfig
+    llm: LLMConfig
     project_root: str = Field(..., description="Root directory of the project")
     env: str = Field("development", description="Environment (development, production)")
 
@@ -69,10 +76,38 @@ def load_yaml_config(file_path: str) -> Dict[str, Any]:
     """
     try:
         with open(file_path, 'r') as f:
-            return yaml.safe_load(f)
+            config_data = yaml.safe_load(f)
+            return config_data or {}
     except FileNotFoundError:
         logger.error(f"Configuration file not found: {file_path}")
         raise
+
+def resolve_env_variables(config_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Resolve environment variables in configuration values.
+    
+    Args:
+        config_data: Configuration dictionary
+        
+    Returns:
+        Dict[str, Any]: Configuration with environment variables resolved
+    """
+    def _resolve_value(value):
+        if isinstance(value, str):
+            # Find ${ENV_VAR} patterns and replace with environment variable values
+            pattern = r'\${([A-Za-z0-9_]+)}'
+            matches = re.findall(pattern, value)
+            result = value
+            for match in matches:
+                env_value = os.getenv(match, "")
+                result = result.replace(f"${{{match}}}", env_value)
+            return result
+        elif isinstance(value, dict):
+            return {k: _resolve_value(v) for k, v in value.items()}
+        elif isinstance(value, list):
+            return [_resolve_value(item) for item in value]
+        return value
+    
+    return _resolve_value(config_data)
 
 def load_config() -> AppConfig:
     """Load and validate the application configuration.
@@ -120,6 +155,18 @@ def load_config() -> AppConfig:
         pdf_config_data = {}
         logger.warning(f"PDF configuration file not found: {pdf_config_path}")
     
+    # Load LLM configuration from YAML
+    llm_config_name = os.getenv("LLM_CONFIG_NAME", "llm_config_default.yaml")
+    llm_config_path = os.path.join(project_root, "config", llm_config_name)
+    try:
+        llm_config_data = load_yaml_config(llm_config_path)
+        # Resolve environment variables in config
+        llm_config_data = resolve_env_variables(llm_config_data)
+        logger.info(f"Loaded LLM configuration from {llm_config_path}")
+    except FileNotFoundError:
+        llm_config_data = {}
+        logger.warning(f"LLM configuration file not found: {llm_config_path}")
+    
     # Build and validate the configuration
     try:
         config = AppConfig(
@@ -140,6 +187,10 @@ def load_config() -> AppConfig:
                 pdf_urls=pdf_config_data.get("pdf_urls", {}),
                 output_directory=pdf_config_data.get("output_directory", "data/IESE"),
             ),
+            llm=LLMConfig(
+                config_file=llm_config_path,
+                config_data=llm_config_data,
+            ),
             project_root=project_root,
             env=env,
         )
@@ -155,6 +206,7 @@ CONFIG = load_config()
 OPENAI_CONFIG = CONFIG.openai
 FAISS_CONFIG = CONFIG.faiss
 PDF_CONFIG = CONFIG.pdf
+LLM_CONFIG = CONFIG.llm
 
 # Backwards compatibility for direct imports
 OPENAI_API_KEY = OPENAI_CONFIG.api_key

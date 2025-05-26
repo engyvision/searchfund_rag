@@ -9,6 +9,7 @@ from src.core.config import (
     OPENAI_CONFIG, 
     FAISS_CONFIG, 
     PDF_CONFIG, 
+    LLM_CONFIG,
     OPENAI_API_KEY
 )
 
@@ -19,6 +20,7 @@ __all__ = [
     'OPENAI_CONFIG', 
     'FAISS_CONFIG', 
     'PDF_CONFIG', 
+    'LLM_CONFIG',
     'OPENAI_API_KEY',
     'get_logger',
     'setup_logging'
