@@ -17,7 +17,7 @@ import importlib
 import pkgutil
 import inspect
 from typing import Dict, Any, Type, List, Tuple
-import pkg_resources
+from importlib.metadata import entry_points
 
 from src.llm.providers.base_provider import BaseLLMProvider
 from src.core import get_logger
@@ -106,7 +106,15 @@ def discover_entry_point_providers() -> None:
     
     try:
         # Look for entry points in the 'webscraper.llm_providers' group
-        for entry_point in pkg_resources.iter_entry_points(group='webscraper.llm_providers'):
+        eps = entry_points()
+        # Python 3.12+ returns a dict-like; 3.9-3.11 returns SelectableGroups
+        if hasattr(eps, 'select'):
+            provider_eps = eps.select(group='webscraper.llm_providers')
+        elif isinstance(eps, dict):
+            provider_eps = eps.get('webscraper.llm_providers', [])
+        else:
+            provider_eps = eps.get('webscraper.llm_providers', [])
+        for entry_point in provider_eps:
             try:
                 # Load the entry point
                 provider_class = entry_point.load()
