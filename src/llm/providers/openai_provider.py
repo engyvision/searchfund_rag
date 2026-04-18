@@ -28,8 +28,8 @@ class OpenAIProvider(BaseLLMProvider):
     
     # Default model names
     DEFAULT_EMBEDDING_MODEL = "text-embedding-3-small"
-    DEFAULT_COMPLETION_MODEL = "o3-mini-2025-01-31"
-    DEFAULT_CLARIFICATION_MODEL = "gpt-4o-mini"
+    DEFAULT_COMPLETION_MODEL = "gpt-5.4"
+    DEFAULT_CLARIFICATION_MODEL = "gpt-5.4-nano"
     
     def __init__(self, config: Dict[str, Any]):
         """Initialize the OpenAI provider from configuration.
